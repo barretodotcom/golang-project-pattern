@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  db:
+    image: mcr.microsoft.com/azure-sql-edge
+    container_name: sql_server
+    cap_add: [ 'SYS_PTRACE' ]
+    environment:
+      - ACCEPT_EULA=1
+      - MSSQL_PID=Developer
+      - MSSQL_USER=docker
+      - MSSQL_SA_PASSWORD=sqlserver
+    ports:
+      - 1433:1433
