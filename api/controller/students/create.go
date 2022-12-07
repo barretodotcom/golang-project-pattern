@@ -1,30 +1,36 @@
 package students
 
 import (
+	"context"
+
 	"github.com/gin-gonic/gin"
+	"github.com/golang-project-pattern/api/controller"
+	"github.com/golang-project-pattern/api/controller/infra/database"
 	"github.com/golang-project-pattern/api/model"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func Create(c *gin.Context) {
-
 	var student model.Student
-
 	c.BindJSON(&student)
 
-	for _, v := range model.Students {
-		if v.Name == student.Name {
-			c.JSON(400, gin.H{
-				"message": "This name is already used.",
-				"status":  "error",
-			})
-			return
-		}
-	}
-	student.ID = len(model.Students) + 1
-	model.Students = append(model.Students, student)
+	count, _ := database.DB.CountDocuments(context.TODO(), bson.D{{"name", student.Name}})
 
-	c.JSON(201, gin.H{
-		"message": "ok",
-		"status":  "created",
-	})
+	if count != 0 {
+		c.JSON(400, controller.NewResponse("Username already registered", "error"))
+		return
+	}
+
+	if len(student.Name) < 10 {
+		c.JSON(400, controller.NewResponse("Username must have more than 10 caracters.", "error"))
+	}
+
+	insertOneResult, err := database.DB.InsertOne(context.TODO(), student, &options.InsertOneOptions{})
+
+	if err != nil {
+		c.JSON(400, err)
+		return
+	}
+	c.JSON(200, insertOneResult)
 }

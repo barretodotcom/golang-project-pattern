@@ -6,8 +6,8 @@ type Service struct {
 	*gin.Engine
 }
 
-func NewService() *Service {
-	return &Service{
+func NewService() Service {
+	return Service{
 		gin.Default(),
 	}
 }
