@@ -1,11 +1,11 @@
 package model
 
 type Student struct {
-	ID   int    `json:"id"`
+	ID   string `json:"id"`
 	Name string `json:"name"`
 }
 
 var Students []Student = []Student{
-	{ID: 1, Name: "Amanda"},
-	{ID: 2, Name: "Lucas"},
+	{ID: "1", Name: "Amanda"},
+	{ID: "2", Name: "Lucas"},
 }

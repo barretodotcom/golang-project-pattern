@@ -1,37 +1,37 @@
 package students
 
 import (
+	"context"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-project-pattern/api/controller"
+	"github.com/golang-project-pattern/api/controller/infra/database"
 	"github.com/golang-project-pattern/api/model"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func Delete(c *gin.Context) {
 
-	var newStudents []model.Student
-	id, err := strconv.Atoi(c.Param("id"))
+	id := c.Param("id")
+	DB := database.DB
+	var student model.Student
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-			"status":  "error",
-		})
+	studentExists := DB.FindOne(context.TODO(), bson.D{{Key: "id", Value: id}})
+
+	if studentExists == nil {
+		c.JSON(http.StatusUnprocessableEntity, controller.NewResponse("Student not found.", "error"))
 		return
 	}
 
-	for _, student := range model.Students {
-		if student.ID != id {
-			newStudents = append(newStudents, student)
+	studentExists.Decode(&student)
 
-		}
+	_, err := DB.DeleteOne(context.TODO(), bson.D{{Key: "id", Value: student.ID}})
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, controller.NewResponse("Could not delete student, try again.", "error"))
+		return
 	}
 
-	model.Students = newStudents
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "ok",
-		"id":      id,
-	})
+	c.JSON(http.StatusOK, controller.NewResponse("Student deleted with success.", "success"))
 }

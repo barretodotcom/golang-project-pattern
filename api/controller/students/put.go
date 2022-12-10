@@ -2,7 +2,6 @@ package students
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-project-pattern/api/model"
@@ -11,14 +10,8 @@ import (
 func Put(c *gin.Context) {
 	var student model.Student
 
-	id, err := strconv.Atoi(c.Param("id"))
+	id := c.Param("id")
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": err.Error(),
-			"status":  "error",
-		})
-	}
 	c.BindJSON(&student)
 
 	for i, v := range model.Students {
