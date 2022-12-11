@@ -34,11 +34,14 @@ func Put(c *gin.Context) {
 
 	student.Name = newStudentParameters.Name
 
-	database.DB.FindOneAndUpdate(context.TODO(), bson.D{{Key: "id", Value: student.ID}}, 
-	bson.D{   
-		{           Key: "$set", Value: bson.D{{Key: "name", Value: student.Name}}}}
-              
-          )
+	database.DB.FindOneAndUpdate(context.TODO(), bson.D{{Key: "id", Value: student.ID}},
+		bson.D{
+			{Key: "$set", Value: bson.D{
+				{Key: "id", Value: student.ID},
+				{Key: "name", Value: student.Name},
+			},
+			},
+		})
 
 	c.JSON(http.StatusNoContent, controller.NewResponse("Updated.", "success."))
 	return
