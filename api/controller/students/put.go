@@ -1,7 +1,6 @@
 package students
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,9 +14,10 @@ import (
 func Put(c *gin.Context) {
 	var student model.Student
 	var newStudentParameters model.Student
+	repository := database.GetRepository()
 	id := c.Param("id")
 
-	studentExists := database.DB.FindOne(context.TODO(), bson.D{{Key: "id", Value: id}})
+	studentExists := repository.FindOneById(id)
 	if studentExists.Err() == mongo.ErrNoDocuments {
 		c.JSON(http.StatusBadGateway, controller.NewResponse("Student doesn't exists.", "error"))
 		return
@@ -34,7 +34,7 @@ func Put(c *gin.Context) {
 
 	student.Name = newStudentParameters.Name
 
-	database.DB.FindOneAndUpdate(context.TODO(), bson.D{{Key: "id", Value: student.ID}},
+	repository.UpdateStudentById(student.ID,
 		bson.D{
 			{Key: "$set", Value: bson.D{
 				{Key: "id", Value: student.ID},

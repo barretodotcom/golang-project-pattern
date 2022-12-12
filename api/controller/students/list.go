@@ -8,13 +8,12 @@ import (
 	"github.com/golang-project-pattern/api/controller"
 	"github.com/golang-project-pattern/api/controller/infra/database"
 	"github.com/golang-project-pattern/api/model"
-	"go.mongodb.org/mongo-driver/bson"
 )
 
 func List(c *gin.Context) {
-	DB := database.DB
+	repository := database.GetRepository()
 	var allStudents []model.Student
-	students, err := DB.Find(context.TODO(), bson.D{{}})
+	students, err := repository.FindAllStudents()
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, controller.NewResponse(err.Error(), "error"))
