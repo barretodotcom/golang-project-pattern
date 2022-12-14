@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+//go:generate mockgen -destination=../mocks/mock_IDatabase.go -package=mocks github.com/golang-project-pattern/api/interfaces IDatabase
 type IDatabase interface {
 	CountStudents(bson.D) int64
 	InsertStudent(model.Student, *options.InsertOneOptions) (*mongo.InsertOneResult, error)
